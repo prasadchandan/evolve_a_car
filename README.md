@@ -20,6 +20,9 @@ Quite a lot of the code in the project is derived from the python Box2D examples
     + Replace line `fullName = util.find_library( name )`
     + With line `fullName = "/System/Library/Frameworks/{}.framework/{}".format(name,name)`
 
+### Demo
+![Evolve a Car Demo GIF](repo-assets/demo.gif)
+
 ### Credits 
 1. [Box2D Examples](https://github.com/openai/box2d-py/tree/master/examples)
 2. [Hack Font](https://github.com/source-foundry/Hack)
