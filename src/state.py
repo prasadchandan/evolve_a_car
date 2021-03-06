@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 @dataclass
 class State:
     fps: int = 0
