@@ -104,7 +104,12 @@ class UserInterface:
         imgui.end()
 
     def draw_sim_controls(self):
-        imgui.begin("Simulation Controls")
+        imgui.set_next_window_size(200, 160)
+        imgui.set_next_window_position(240, 40)
+        imgui.begin("Simulation Controls",
+                    flags=imgui.WINDOW_NO_MOVE |
+                    imgui.WINDOW_NO_TITLE_BAR  |
+                    imgui.WINDOW_NO_RESIZE)
 
         _, State.draw_aabb = imgui.checkbox("Draw AABBs", State.draw_aabb)
         _, State.draw_joints = imgui.checkbox("Draw Joints", State.draw_joints)
@@ -123,7 +128,6 @@ class UserInterface:
         self.draw_stats_box()
         self.draw_sim_controls()
         self.draw_car_positions()
-        imgui.show_test_window()
        
     def __del__(self):
         self.clean_up()
