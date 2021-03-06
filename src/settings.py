@@ -30,8 +30,8 @@ class config(object):
 class fwSettings(object):
     # The default backend to use in (can be: pyglet, pygame, etc.)
     backend = 'pyglet'
-    screen_width = 1400
-    screen_height = 900
+    screen_width = 800
+    screen_height = 600
 
     # Physics options
     hz = 60.0
