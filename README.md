@@ -10,7 +10,7 @@ Quite a lot of the code in the project is derived from the python Box2D examples
 1. Install [Poetry](https://python-poetry.org/)
 2. Install the dependencies run `poetry install`
 3. On macOS follow the instructions below to fix OpenGL issues
-4. Run application `poetry run src/car.py`
+4. Run application `poetry run src/app.py`
 ### Known Issues
 
 1. On macOS Big Sur OpenGL is not found see discussion on [StackOverflow for details](https://stackoverflow.com/questions/63475461/unable-to-import-opengl-gl-in-python-on-macos).
