@@ -13,6 +13,7 @@ from framework import Keys
 from ui import UserInterface
 from bridge import create_bridge
 from renderer import PygletFramework as Framework
+from evolution import EvolutionManager, EvolutionConfig
 
 from Box2D import (b2CircleShape, b2EdgeShape,
                    b2FixtureDef, b2PolygonShape,
@@ -145,8 +146,8 @@ def destroy_car(world, car):
     world.DestroyBody(car['wheels'][1])
 
 class App (Framework):
-    name = "Car"
-    description = "Keys: left = a, brake = s, right = d, hz down = q, hz up = e"
+    name = "Car Evolution"
+    description = "Keys: r = new gen, g = GA mode, t = ES mode | left = a, brake = s, right = d"
     hz = 4
     zeta = 0.7
     speed = 5
@@ -154,6 +155,12 @@ class App (Framework):
 
     def __init__(self):
         super(App, self).__init__()
+
+        # Initialize evolution system
+        # Change strategy to 'es' for Evolution Strategies or 'ga' for Genetic Algorithm
+        self.evolution_config = EvolutionConfig(strategy='ga')
+        self.evolution_manager = EvolutionManager(self.evolution_config)
+        State.evolution_strategy = self.evolution_config.strategy.upper()
 
         # The ground -- create some terrain
         ground = self.world.CreateStaticBody(
@@ -218,10 +225,20 @@ class App (Framework):
         State.cars = self.add_cars()
         self.ui = UserInterface(self.window)
 
-    def add_cars(self):
+    def add_cars(self, genes=None):
+        """
+        Add cars to the simulation.
+
+        Args:
+            genes: Optional list of gene dictionaries. If None, generates random genes.
+        """
         cars = []
         for i in range(10):
-            gene = get_random_car_gene()
+            if genes is not None and i < len(genes):
+                gene = genes[i]
+            else:
+                gene = get_random_car_gene()
+
             car_id = i
             car, wheels, springs = car_from_gene(self.world, gene)
             cars.append({
@@ -238,10 +255,37 @@ class App (Framework):
         return cars
 
     def start_new_generation(self):
+        """Start a new generation using evolution."""
+        # Extract genes and fitness scores from current generation
+        current_genes = [car['gene'] for car in State.cars]
+        fitness_scores = [car['car'].position.x for car in State.cars]
+
+        # Use evolution to generate next generation
+        if State.generation == 0:
+            # First generation uses random genes (already created)
+            new_genes = current_genes
+        else:
+            # Evolve population based on fitness
+            new_genes = self.evolution_manager.evolve(current_genes, fitness_scores)
+
+        # Destroy current generation
         for car in State.cars:
             destroy_car(self.world, car)
-        State.cars = self.add_cars()
+
+        # Create new generation from evolved genes
+        State.cars = self.add_cars(genes=new_genes)
         State.generation += 1
+
+        # Update and print evolution statistics
+        if State.generation > 1:
+            stats = self.evolution_manager.get_latest_stats()
+            State.generation_best = stats['max']
+            State.generation_mean = stats['mean']
+            State.generation_min = stats['min']
+            State.best_fitness = max(State.best_fitness, stats['max'])
+            print(f"Generation {State.generation - 1} Stats: "
+                  f"Max={stats['max']:.2f}, Mean={stats['mean']:.2f}, "
+                  f"Min={stats['min']:.2f}, Std={stats['std']:.2f}")
        
     def Keyboard(self, key):
         if key == Keys.K_a:
@@ -260,6 +304,18 @@ class App (Framework):
                 spring.springFrequencyHz = self.hz
         elif key == Keys.K_r:
             self.start_new_generation()
+        elif key == Keys.K_g:
+            # Switch to Genetic Algorithm
+            self.evolution_config.strategy = 'ga'
+            self.evolution_manager = EvolutionManager(self.evolution_config)
+            State.evolution_strategy = 'GA'
+            print("Switched to Genetic Algorithm (GA)")
+        elif key == Keys.K_t:
+            # Switch to Evolution Strategies
+            self.evolution_config.strategy = 'es'
+            self.evolution_manager = EvolutionManager(self.evolution_config)
+            State.evolution_strategy = 'ES'
+            print("Switched to Evolution Strategies (ES)")
 
     def sort_cars_by_score(self):
         State.cars  = sorted(State.cars, key=lambda item: item['car'].position.x, reverse=True)
