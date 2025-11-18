@@ -6,12 +6,8 @@ Unit tests for the car evolution application core functions.
 import pytest
 import numpy as np
 from unittest.mock import Mock, MagicMock, patch
-import sys
-import os
 
-# Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-
+# Imports from src are handled by conftest.py
 from app import (
     generate_random_vertices,
     get_random_car_gene,

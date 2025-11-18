@@ -4,12 +4,8 @@
 Unit tests for the state module.
 """
 import pytest
-import sys
-import os
 
-# Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-
+# Imports from src are handled by conftest.py
 from state import State
 
 

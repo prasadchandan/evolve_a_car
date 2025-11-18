@@ -5,12 +5,8 @@ Unit tests for the bridge module.
 """
 import pytest
 from unittest.mock import Mock, MagicMock
-import sys
-import os
 
-# Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-
+# Imports from src are handled by conftest.py
 from bridge import create_bridge
 
 
