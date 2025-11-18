@@ -20,5 +20,10 @@ class State:
     paused: bool = False
     reset: bool = False
 
-    # Genetic Algorithms
+    # Evolution System
     generation: int = 0
+    evolution_strategy: str = 'GA'  # 'GA' or 'ES'
+    best_fitness: float = 0.0
+    generation_best: float = 0.0
+    generation_mean: float = 0.0
+    generation_min: float = 0.0

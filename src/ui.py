@@ -99,7 +99,25 @@ class UserInterface:
                             ('Joints', f'{State.num_joints}'),
                             ('Contacts', f'{State.num_contacts}'),
                             ('Proxies', f'{State.num_proxies}'),
-                            ('Generation', f'{State.generation}')
+                        ])
+        imgui.end()
+
+    def draw_evolution_stats(self):
+        imgui.set_next_window_size(200, 140)
+        imgui.set_next_window_position(460, 40)
+        imgui.begin("Evolution Stats",
+                    flags=imgui.WINDOW_NO_MOVE |
+                    imgui.WINDOW_NO_TITLE_BAR  |
+                    imgui.WINDOW_NO_RESIZE)
+
+        self.draw_table(headers=['Property', 'Value'],
+                        rows=[
+                            ('Strategy', f'{State.evolution_strategy}'),
+                            ('Generation', f'{State.generation}'),
+                            ('Best Ever', f'{State.best_fitness:.2f}'),
+                            ('Gen Best', f'{State.generation_best:.2f}'),
+                            ('Gen Mean', f'{State.generation_mean:.2f}'),
+                            ('Gen Min', f'{State.generation_min:.2f}'),
                         ])
         imgui.end()
 
@@ -127,6 +145,7 @@ class UserInterface:
         self.draw_menu_bar()
         self.draw_stats_box()
         self.draw_sim_controls()
+        self.draw_evolution_stats()
         self.draw_car_positions()
        
     def __del__(self):
