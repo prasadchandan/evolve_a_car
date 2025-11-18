@@ -1,0 +1,206 @@
+name: Build Binaries
+
+# This workflow builds binaries for multiple platforms and architectures:
+# - Linux: x86_64 and ARM64 (aarch64)
+# - Windows: x86_64 and ARM64 (experimental)
+# - macOS: x86_64 (Intel) and ARM64 (Apple Silicon M1/M2/M3/M4)
+#
+# Note: ARM64 builds for Linux use QEMU emulation and Windows ARM64 builds
+# are experimental due to PyInstaller limitations.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag for the release'
+        required: false
+        default: 'latest'
+
+jobs:
+  build:
+    name: Build on ${{ matrix.platform_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x86_64
+          - os: ubuntu-latest
+            platform_name: Linux x86_64
+            artifact_name: evolve_a_car
+            asset_name: evolve_a_car-linux-x86_64
+            arch: x86_64
+
+          # Linux ARM64
+          - os: ubuntu-latest
+            platform_name: Linux ARM64
+            artifact_name: evolve_a_car
+            asset_name: evolve_a_car-linux-aarch64
+            arch: aarch64
+            use_qemu: true
+
+          # Windows x86_64
+          - os: windows-latest
+            platform_name: Windows x86_64
+            artifact_name: evolve_a_car.exe
+            asset_name: evolve_a_car-windows-x86_64.exe
+            arch: x86_64
+
+          # Windows ARM64
+          - os: windows-latest
+            platform_name: Windows ARM64
+            artifact_name: evolve_a_car.exe
+            asset_name: evolve_a_car-windows-aarch64.exe
+            arch: aarch64
+            target_arch: ARM64
+
+          # macOS x86_64 (Intel)
+          - os: macos-13
+            platform_name: macOS x86_64
+            artifact_name: evolve_a_car
+            asset_name: evolve_a_car-macos-x86_64
+            arch: x86_64
+
+          # macOS ARM64 (Apple Silicon M1/M2/M3)
+          - os: macos-14
+            platform_name: macOS ARM64
+            artifact_name: evolve_a_car
+            asset_name: evolve_a_car-macos-aarch64
+            arch: aarch64
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU (for Linux ARM64 cross-compilation)
+      if: matrix.use_qemu == true
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: arm64
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install UV
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      shell: bash
+
+    - name: Create virtual environment
+      run: uv venv
+      shell: bash
+
+    - name: Install dependencies
+      run: |
+        uv pip install -e ".[dev]"
+      shell: bash
+
+    - name: Install system dependencies (Linux x86_64)
+      if: matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
+
+    - name: Install system dependencies (Linux ARM64)
+      if: matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static
+        echo "Building for ARM64 architecture using QEMU emulation"
+        # Note: This is experimental and may have limitations
+
+    - name: Build with PyInstaller (Windows ARM64)
+      if: matrix.target_arch == 'ARM64'
+      run: |
+        uv run pyinstaller --target-architecture ARM64 evolve_a_car.spec
+      shell: bash
+      continue-on-error: true
+
+    - name: Build with PyInstaller (Standard)
+      if: matrix.target_arch != 'ARM64'
+      run: |
+        uv run pyinstaller evolve_a_car.spec
+      shell: bash
+
+    - name: List dist directory
+      run: |
+        ls -la dist/
+      shell: bash
+      continue-on-error: true
+
+    - name: Verify build output
+      id: verify
+      run: |
+        if [ -f "dist/${{ matrix.artifact_name }}" ]; then
+          echo "build_success=true" >> $GITHUB_OUTPUT
+        else
+          echo "build_success=false" >> $GITHUB_OUTPUT
+          echo "Warning: Build artifact not found"
+        fi
+      shell: bash
+      continue-on-error: true
+
+    - name: Rename artifact
+      if: steps.verify.outputs.build_success == 'true'
+      run: |
+        mv dist/${{ matrix.artifact_name }} dist/${{ matrix.asset_name }}
+      shell: bash
+
+    - name: Upload artifact
+      if: steps.verify.outputs.build_success == 'true'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.asset_name }}
+        path: dist/${{ matrix.asset_name }}
+        if-no-files-found: error
+
+    - name: Create Release Archive (Unix)
+      if: steps.verify.outputs.build_success == 'true' && !contains(matrix.os, 'windows') && startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd dist
+        tar -czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.asset_name }}
+      shell: bash
+
+    - name: Create Release Archive (Windows)
+      if: steps.verify.outputs.build_success == 'true' && contains(matrix.os, 'windows') && startsWith(github.ref, 'refs/tags/')
+      run: |
+        cd dist
+        7z a ${{ matrix.asset_name }}.zip ${{ matrix.asset_name }}
+      shell: bash
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Display structure of downloaded files
+      run: ls -R artifacts
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        draft: false
+        prerelease: false
+        files: |
+          artifacts/**/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

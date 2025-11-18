@@ -7,7 +7,7 @@ class State:
     num_proxies: int = 0
     num_contacts: int = 0
 
-    cars = None
+    cars: object = None
     car_pos: float = 0.0
 
     draw_aabb: bool = False
@@ -21,4 +21,4 @@ class State:
     reset: bool = False
 
     # Genetic Algorithms
-    generation = 0
+    generation: int = 0

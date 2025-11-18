@@ -7,13 +7,20 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 dependencies = [
     "scipy>=1.16.3",
     "box2d>=2.3.10",
     "imgui[pyglet]>=2.0.0",
     "numpy>=2.3.5",
     "pyglet>=2.1.11",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "pyinstaller>=6.0.0",
 ]
 
 [build-system]

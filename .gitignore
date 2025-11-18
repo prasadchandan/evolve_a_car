@@ -8,3 +8,13 @@ uv.lock
 *.egg-info
 dist/
 build/
+
+# Test and coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.cover
+
+# PyInstaller
+*.spec~
