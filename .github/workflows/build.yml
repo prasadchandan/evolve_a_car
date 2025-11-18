@@ -2,11 +2,10 @@ name: Build Binaries
 
 # This workflow builds binaries for multiple platforms and architectures:
 # - Linux: x86_64 and ARM64 (aarch64)
-# - Windows: x86_64 and ARM64 (experimental)
-# - macOS: x86_64 (Intel) and ARM64 (Apple Silicon M1/M2/M3/M4)
+# - Windows: x86_64
+# - macOS: ARM64 (Apple Silicon M1/M2/M3/M4)
 #
-# Note: ARM64 builds for Linux use QEMU emulation and Windows ARM64 builds
-# are experimental due to PyInstaller limitations.
+# Note: ARM64 builds for Linux use QEMU emulation.
 
 on:
   push:
@@ -47,21 +46,6 @@ jobs:
             platform_name: Windows x86_64
             artifact_name: evolve_a_car.exe
             asset_name: evolve_a_car-windows-x86_64.exe
-            arch: x86_64
-
-          # Windows ARM64
-          - os: windows-latest
-            platform_name: Windows ARM64
-            artifact_name: evolve_a_car.exe
-            asset_name: evolve_a_car-windows-aarch64.exe
-            arch: aarch64
-            target_arch: ARM64
-
-          # macOS x86_64 (Intel)
-          - os: macos-13
-            platform_name: macOS x86_64
-            artifact_name: evolve_a_car
-            asset_name: evolve_a_car-macos-x86_64
             arch: x86_64
 
           # macOS ARM64 (Apple Silicon M1/M2/M3)
@@ -115,15 +99,7 @@ jobs:
         echo "Building for ARM64 architecture using QEMU emulation"
         # Note: This is experimental and may have limitations
 
-    - name: Build with PyInstaller (Windows ARM64)
-      if: matrix.target_arch == 'ARM64'
-      run: |
-        uv run pyinstaller --target-architecture ARM64 evolve_a_car.spec
-      shell: bash
-      continue-on-error: true
-
-    - name: Build with PyInstaller (Standard)
-      if: matrix.target_arch != 'ARM64'
+    - name: Build with PyInstaller
       run: |
         uv run pyinstaller evolve_a_car.spec
       shell: bash

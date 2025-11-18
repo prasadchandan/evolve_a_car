@@ -15,8 +15,6 @@ Pre-built binaries for all supported platforms are available in the [GitHub Rele
 - `evolve_a_car-linux-x86_64` - Linux 64-bit Intel/AMD
 - `evolve_a_car-linux-aarch64` - Linux 64-bit ARM
 - `evolve_a_car-windows-x86_64.exe` - Windows 64-bit Intel/AMD
-- `evolve_a_car-windows-aarch64.exe` - Windows 64-bit ARM (experimental)
-- `evolve_a_car-macos-x86_64` - macOS Intel
 - `evolve_a_car-macos-aarch64` - macOS Apple Silicon (M1/M2/M3/M4)
 
 ### How to run from source
@@ -65,9 +63,7 @@ The project uses GitHub Actions for continuous integration and deployment:
   - ARM64 (aarch64) - Supported using QEMU emulation
 - **Windows**
   - x86_64 (amd64) - Fully supported
-  - ARM64 (aarch64) - Experimental (cross-compilation)
 - **macOS**
-  - x86_64 (Intel) - Fully supported
   - ARM64 (Apple Silicon M1/M2/M3/M4) - Fully supported
 
 To trigger a release build:
@@ -76,7 +72,7 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The build workflow will create binaries for all 6 platform/architecture combinations and attach them to the GitHub release.
+The build workflow will create binaries for all 4 platform/architecture combinations and attach them to the GitHub release.
 ### Known Issues
 
 1. On macOS Big Sur OpenGL is not found see discussion on [StackOverflow for details](https://stackoverflow.com/questions/63475461/unable-to-import-opengl-gl-in-python-on-macos).
