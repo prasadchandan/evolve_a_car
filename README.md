@@ -1,22 +1,23 @@
 ## Evolve a Car
 
-Use genetic algorithms to evolve a car. The framework currently uses Box2D for the physics engine, pyglet for rendering and imgui for the UI. 
+Use genetic algorithms to evolve a car. The framework currently uses Box2D for the physics engine, pyglet for rendering and imgui for the UI.
 
-The code to 'evolve' the cars from generation to generation has not yet been implemented. This is a work in progress. 
+The code to 'evolve' the cars from generation to generation has not yet been implemented. This is a work in progress.
 
 Quite a lot of the code in the project is derived from the python Box2D examples.
 
 ### How to run
-1. Install [Poetry](https://python-poetry.org/)
-2. Install the dependencies run `poetry install`
-3. On macOS follow the instructions below to fix OpenGL issues
-4. Run application `poetry run src/app.py`
+1. Install [UV](https://github.com/astral-sh/uv) - `curl -LsSf https://astral.sh/uv/install.sh | sh`
+2. Create virtual environment: `uv venv`
+3. Install the dependencies: `uv pip install -e .`
+4. On macOS follow the instructions below to fix OpenGL issues
+5. Run application: `uv run python src/app.py`
 ### Known Issues
 
 1. On macOS Big Sur OpenGL is not found see discussion on [StackOverflow for details](https://stackoverflow.com/questions/63475461/unable-to-import-opengl-gl-in-python-on-macos).
-  - Temporary Fix: 
-    + Find virtual environment path `poetry show -v`
-    + Open `<venvpath>/lib/OpenGL/platform/ctypesloader.py`
+  - Temporary Fix:
+    + Find virtual environment path (should be `.venv` in the project root)
+    + Open `.venv/lib/python3.x/site-packages/OpenGL/platform/ctypesloader.py`
     + Replace line `fullName = util.find_library( name )`
     + With line `fullName = "/System/Library/Frameworks/{}.framework/{}".format(name,name)`
 

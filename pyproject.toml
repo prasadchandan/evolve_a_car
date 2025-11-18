@@ -1,20 +1,24 @@
-[tool.poetry]
+[project]
 name = "evolve_a_car"
 version = "0.1.0"
 description = "Evolve a car using genetic algorithms"
-authors = ["Chandan Prasad M <prasadchandan@gmail.com>"]
-license = "MIT"
-
-[tool.poetry.dependencies]
-python = "^3.8"
-scipy = "^1.6.1"
-Box2D = "^2.3.10"
-imgui = {extras = ["pyglet"], version = "^1.3.0"}
-numpy = "^1.20.1"
-pyglet = "^1.5.15"
-
-[tool.poetry.dev-dependencies]
+authors = [
+    {name = "Chandan Prasad M", email = "prasadchandan@gmail.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "scipy>=1.16.3",
+    "box2d>=2.3.10",
+    "imgui[pyglet]>=2.0.0",
+    "numpy>=2.3.5",
+    "pyglet>=2.1.11",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

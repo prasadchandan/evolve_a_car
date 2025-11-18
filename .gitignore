@@ -2,3 +2,9 @@ imgui.ini
 __pycache__
 .vscode
 .venv
+uv.lock
+*.pyc
+*.pyo
+*.egg-info
+dist/
+build/
