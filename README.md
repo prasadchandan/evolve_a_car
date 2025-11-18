@@ -12,6 +12,45 @@ Quite a lot of the code in the project is derived from the python Box2D examples
 3. Install the dependencies: `uv pip install -e .`
 4. On macOS follow the instructions below to fix OpenGL issues
 5. Run application: `uv run python src/app.py`
+
+### Development
+
+#### Running Tests
+```bash
+# Install development dependencies
+uv pip install -e ".[dev]"
+
+# Run all tests
+uv run pytest tests/ -v
+
+# Run tests with coverage
+uv run pytest tests/ --cov=src --cov-report=html
+```
+
+#### Building Binaries
+The project uses PyInstaller to create standalone executables for Linux, Windows, and macOS.
+
+```bash
+# Install development dependencies (includes PyInstaller)
+uv pip install -e ".[dev]"
+
+# Build binary for your platform
+uv run pyinstaller evolve_a_car.spec
+
+# Find the binary in the dist/ directory
+```
+
+#### CI/CD
+The project uses GitHub Actions for continuous integration and deployment:
+
+- **CI Workflow**: Runs tests on every push and pull request across multiple Python versions (3.8-3.12) and platforms (Linux, Windows, macOS)
+- **Build Workflow**: Creates binaries for all platforms when a version tag is pushed (e.g., `v1.0.0`)
+
+To trigger a release build:
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
 ### Known Issues
 
 1. On macOS Big Sur OpenGL is not found see discussion on [StackOverflow for details](https://stackoverflow.com/questions/63475461/unable-to-import-opengl-gl-in-python-on-macos).
