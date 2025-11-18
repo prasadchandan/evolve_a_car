@@ -6,6 +6,9 @@ The code to 'evolve' the cars from generation to generation has not yet been imp
 
 Quite a lot of the code in the project is derived from the python Box2D examples.
 
+### Requirements
+- Python 3.11 or higher
+
 ### How to run
 1. Install [UV](https://github.com/astral-sh/uv) - `curl -LsSf https://astral.sh/uv/install.sh | sh`
 2. Create virtual environment: `uv venv`
@@ -43,8 +46,8 @@ uv run pyinstaller evolve_a_car.spec
 #### CI/CD
 The project uses GitHub Actions for continuous integration and deployment:
 
-- **CI Workflow**: Runs tests on every push and pull request across multiple Python versions (3.8-3.12) and platforms (Linux, Windows, macOS)
-- **Build Workflow**: Creates binaries for all platforms when a version tag is pushed (e.g., `v1.0.0`)
+- **CI Workflow**: Runs tests on every push and pull request across Python 3.11-3.12 on Linux, Windows, and macOS
+- **Build Workflow**: Creates standalone binaries for Linux, Windows, and macOS when a version tag is pushed (e.g., `v1.0.0`). Binaries are uploaded as GitHub release artifacts.
 
 To trigger a release build:
 ```bash
